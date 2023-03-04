@@ -60,7 +60,6 @@ class MazeSearch:
         # Check for exit
         if self.check_exit(row, col): 
             self.mark(row,col, "V")
-            self.pprint_matrix(self.traveled)
             return True 
         
         # Check Up 
