@@ -19,6 +19,7 @@ class MazeSearch:
     def __init__(self, maze): 
         self.maze = maze 
         self.traveled = self.make_traveled() # Traveled maze 
+        self.stored_movements = []
 
     def make_traveled(self):  
         '''Returns the traveled maze from the maze member variable'''
@@ -53,7 +54,7 @@ class MazeSearch:
 
     def solve_maze(self, row, col): 
         '''Uses recursive backtracking to exhaustively search the maze for an exit, returns true if exit is found, false otherwise'''
-        self.pprint_matrix(self.traveled)
+        self.stored_movements.append((row, col))
         self.mark(row, col, 1)
 
         # Check for exit
