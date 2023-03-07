@@ -41,7 +41,7 @@ class MazeSearch:
     def valid_move(self, row, col): 
         '''Returns true if the row, col corresponding to the 2d array is in range'''
         if (row >= 0 and row < len(self.maze)) and (col >= 0 and col < len(self.maze[row])): 
-            if (self.maze[row][col] == "P" or self.maze[row][col] == "E") and (self.traveled[row][col] != 1 and self.traveled[row][col] != "X") : 
+            if (self.maze[row][col] == "1" or self.maze[row][col] == "E") and (self.traveled[row][col] != 1 and self.traveled[row][col] != "X") : 
                 return True 
             
     def check_exit(self, row, col): 
