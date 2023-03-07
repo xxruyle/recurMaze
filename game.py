@@ -5,14 +5,15 @@ sys.setrecursionlimit(30000)
 
 
 pygame.init()
+maze_height = 32
+maze_width = 32
 
-
-screen_width = 640
-screen_height = 640
+screen_height = maze_height * 15
+screen_width =  maze_width * 15 
 
 screen = pygame.display.set_mode((screen_width,screen_height))
 
-g1 = recurMaze.Genmaze(64,64)
+g1 = recurMaze.Genmaze(maze_height,maze_width)
 
 g1.generate(1,1)
 g1.make_exit(g1.visited)
@@ -70,12 +71,12 @@ def draw_matrix(matrix):
 
 # History of the rat movements 
 rat_history = []
-def draw_rat(row, col, back_track): 
+def draw_rat(row, col, back_track, is_returning_home): 
     
     get_pixel_position = pixel_positions[row][col]
     x = get_pixel_position[0] #+ (screen_width // draw_scale) // 4
     y = get_pixel_position[1] #+ (screen_height // draw_scale) // 4
-    rat_history.append((x,y, back_track))
+    rat_history.append((x,y, back_track, is_returning_home))
     width = (screen_width // draw_scale) #// 2
     height = (screen_height // draw_scale) #// 2 
 
@@ -97,12 +98,15 @@ def draw_rat_history(history):
         x = tup[0] #+ (screen_height // draw_scale) // 6
         y = tup[1] #+ (screen_height // draw_scale) // 6 
         back_track = tup[2]
+        is_returning_home = tup[3]
         width = (screen_width // draw_scale) 
         height = (screen_height // draw_scale) 
 
         # If the movement is a backtrack move or not 
         if back_track: 
             color = pygame.Color(84, 196, 188) # Blue 
+        elif is_returning_home: 
+            color = pygame.Color("#4fd626")
         else: 
             color = pygame.Color(247, 80, 12) # Orange 
         path = pygame.Rect(x,y, width, height)
@@ -140,7 +144,7 @@ while game_loop:
         draw_matrix(g1.visited)
         draw_rat_history(rat_history)
 
-        draw_rat(m1.stored_movements[movement_num][0], m1.stored_movements[movement_num][1], m1.stored_movements[movement_num][2])
+        draw_rat(m1.stored_movements[movement_num][0], m1.stored_movements[movement_num][1], m1.stored_movements[movement_num][2], m1.stored_movements[movement_num][3])
 
         if movement_num < len(m1.stored_movements) - 1:
             movement_num += 1 
@@ -149,7 +153,7 @@ while game_loop:
 
     pygame.display.flip()
     
-    pygame.time.wait(1)
+    pygame.time.wait(10)
 
 
 

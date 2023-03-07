@@ -19,7 +19,7 @@ class MazeSearch:
     def __init__(self, maze): 
         self.maze = maze 
         self.traveled = self.make_traveled() # Traveled maze 
-        self.stored_movements = []
+        self.stored_movements = [] # (row, col, is_backtrackng, is_returning_to_start)
 
     def make_traveled(self):  
         '''Returns the traveled maze from the maze member variable'''
@@ -54,36 +54,41 @@ class MazeSearch:
 
     def solve_maze(self, row, col): 
         '''Uses recursive backtracking to exhaustively search the maze for an exit, returns true if exit is found, false otherwise'''
-        self.stored_movements.append((row, col, False))
+        self.stored_movements.append((row, col, False, False))
         self.mark(row, col, 1)
 
         # Check for exit
         if self.check_exit(row, col): 
             self.mark(row,col, "V")
+            self.stored_movements.append((row,col,False,True))
             return True 
         
         # Check Up 
         if self.valid_move(row-1, col): 
             if self.solve_maze(row-1, col): 
+                self.stored_movements.append((row,col,False,True))
                 return True 
         
         # Check Right 
         if self.valid_move(row, col+1): 
             if self.solve_maze(row, col+1): 
+                self.stored_movements.append((row,col,False,True))
                 return True 
         
         # Check Down 
         if self.valid_move(row+1, col): 
             if self.solve_maze(row+1, col): 
+                self.stored_movements.append((row,col,False,True))
                 return True 
             
         # Check Left
         if self.valid_move(row, col-1):
             if self.solve_maze(row, col-1): 
+                self.stored_movements.append((row,col,False,True))
                 return True 
 
         # If no valid move is found mark the position as an X and backtrack
         self.mark(row, col, "X")     
-        self.stored_movements.append((row, col, True)) 
+        self.stored_movements.append((row, col, True, False)) 
         return False 
     
