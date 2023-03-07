@@ -1,9 +1,7 @@
 # recurMaze 
-Graph traversal of a maze using recursive backtracking, with a work in progress graphical representation using pygame
+Graph traversal and generation of a maze using Depth-first search 
 
-## Plans 
-1) Maze generation 
 
 ## Pygame representation 
-![Pygame Maze Prototype](https://i.gyazo.com/3cd7488e9c644dd68927ef06ed85a5a1.png)
+![Pygame Maze Prototype](https://i.gyazo.com/c3805aa2a89c78dc82dc13020c12be18.png)
 

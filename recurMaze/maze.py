@@ -41,7 +41,7 @@ class MazeSearch:
     def valid_move(self, row, col): 
         '''Returns true if the row, col corresponding to the 2d array is in range'''
         if (row >= 0 and row < len(self.maze)) and (col >= 0 and col < len(self.maze[row])): 
-            if (self.maze[row][col] == "1" or self.maze[row][col] == "E") and (self.traveled[row][col] != 1 and self.traveled[row][col] != "X") : 
+            if (self.maze[row][col] == 1 or self.maze[row][col] == "E") and (self.traveled[row][col] != 1 and self.traveled[row][col] != "X") : 
                 return True 
             
     def check_exit(self, row, col): 
@@ -54,7 +54,7 @@ class MazeSearch:
 
     def solve_maze(self, row, col): 
         '''Uses recursive backtracking to exhaustively search the maze for an exit, returns true if exit is found, false otherwise'''
-        self.stored_movements.append((row, col))
+        self.stored_movements.append((row, col, False))
         self.mark(row, col, 1)
 
         # Check for exit
@@ -83,6 +83,7 @@ class MazeSearch:
                 return True 
 
         # If no valid move is found mark the position as an X and backtrack
-        self.mark(row, col, "X")      
+        self.mark(row, col, "X")     
+        self.stored_movements.append((row, col, True)) 
         return False 
     

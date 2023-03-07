@@ -1,24 +1,47 @@
 import pygame 
 import recurMaze
-from random import randrange
+import sys 
+sys.setrecursionlimit(30000)
+
 
 pygame.init()
 
 
-screen_width = 1000
-screen_height = 1000
+screen_width = 640
+screen_height = 640
 
 screen = pygame.display.set_mode((screen_width,screen_height))
 
-p1 = recurMaze.ParseMaze("recurMaze/maze.txt")
-m1 = recurMaze.MazeSearch(p1.make_matrix()) 
+g1 = recurMaze.Genmaze(64,64)
+
+g1.generate(1,1)
+g1.make_exit(g1.visited)
+
+
+movements = g1.stored_movements
+m1 = recurMaze.MazeSearch(g1.visited) 
 pixel_positions = m1.make_traveled()
 
 draw_scale = len(m1.maze[0]) # Draw scale is based on the length of the maze row 
 # Screen scale is fit perfectly when the matrix is a square n x n matrix 
 
 # Calling the solve_maze function and getting the path history 
-solved = m1.solve_maze(0,0)
+solved = m1.solve_maze(1,1)
+def create_pixel_positions(matrix): 
+    x = 0
+    y = 0
+    width = screen_width // draw_scale 
+    height = screen_height // draw_scale   
+    for i, row in enumerate(matrix): 
+        for j, char in enumerate(row): 
+            pixel_positions[i][j] = (x,y)
+            x += width
+
+        x = 0 
+        y += height
+
+# Getting pixel positions 
+create_pixel_positions(g1.visited)
 
 def draw_matrix(matrix): 
     x = 0 
@@ -27,49 +50,61 @@ def draw_matrix(matrix):
     height = screen_height // draw_scale  
     for i, row in enumerate(matrix): 
         for j, char in enumerate(row): 
-            if char == "P": 
-                color = pygame.Color("White")
+            if char == 1: 
+                color = pygame.Color(239, 238, 235)
             elif char == "E": 
                 color = pygame.Color("Green")  
-            elif char == "W": 
+            elif char == 0: 
                 color = pygame.Color(92,86,56)
 
             bar = pygame.Rect(x, y, width, height)
-            pygame.draw.rect(screen, color, bar, 0, 2) 
-            pixel_positions[i][j] = (x,y)
+            pygame.draw.rect(screen, color, bar) 
+            #pixel_positions[i][j] = (x,y)
 
             x += width
         x = 0 
         y += height
 
+
+
+
 # History of the rat movements 
 rat_history = []
-def draw_rat(row, col): 
+def draw_rat(row, col, back_track): 
     
     get_pixel_position = pixel_positions[row][col]
     x = get_pixel_position[0] #+ (screen_width // draw_scale) // 4
     y = get_pixel_position[1] #+ (screen_height // draw_scale) // 4
-    rat_history.append((x,y))
+    rat_history.append((x,y, back_track))
     width = (screen_width // draw_scale) #// 2
     height = (screen_height // draw_scale) #// 2 
 
 
-
+    
     color = pygame.Color("RED")
 
     bar = pygame.Rect(x, y, width, height) 
     pygame.draw.rect(screen, color, bar)
 
+generation_stack = g1.base_grid
+def draw_generation(row, col): 
+    g1.base_grid[row][col] = 1 
+
 
 def draw_rat_history(history): 
     '''Marks the places the rat has visited'''
-    for i, tup in enumerate(history): 
+    for tup in history: 
         x = tup[0] #+ (screen_height // draw_scale) // 6
         y = tup[1] #+ (screen_height // draw_scale) // 6 
+        back_track = tup[2]
         width = (screen_width // draw_scale) 
         height = (screen_height // draw_scale) 
-    
-        color = pygame.Color("Orange")
+
+        # If the movement is a backtrack move or not 
+        if back_track: 
+            color = pygame.Color(84, 196, 188) # Blue 
+        else: 
+            color = pygame.Color(247, 80, 12) # Orange 
         path = pygame.Rect(x,y, width, height)
         pygame.draw.rect(screen, color, path)
 
@@ -84,22 +119,38 @@ def draw_rat_history(history):
 game_loop = True 
 
 # The movement number increases each time draw_rat is called 
+# The gen num increase each time draw_generation is called 
+gen_num = 0 
+gen_finished = False   
 movement_num = 0 
 while game_loop: 
-    #color = pygame.Color("Red") 
+    # Draws the base grid with only the walls 
 
-    #bar = pygame.Rect(200, 300, 50, 100)
-    #pygame.draw.rect(screen, color, bar)
-    draw_matrix(p1.make_matrix())
-    draw_rat_history(rat_history)
+    if not gen_finished: 
+        draw_generation(g1.stored_movements[gen_num][0], g1.stored_movements[gen_num][1])
+        draw_matrix(generation_stack)
+        if gen_num < len(g1.stored_movements) - 1:
+            gen_num += 1 
+        else: 
+            gen_finished = True 
 
-    draw_rat(m1.stored_movements[movement_num][0], m1.stored_movements[movement_num][1])
+        
+
+    if gen_finished: 
+        draw_matrix(g1.visited)
+        draw_rat_history(rat_history)
+
+        draw_rat(m1.stored_movements[movement_num][0], m1.stored_movements[movement_num][1], m1.stored_movements[movement_num][2])
+
+        if movement_num < len(m1.stored_movements) - 1:
+            movement_num += 1 
+
+    
 
     pygame.display.flip()
     
     pygame.time.wait(1)
-    if movement_num < len(m1.stored_movements) - 1:
-        movement_num += 1 
+
 
 
     for event in pygame.event.get(): 
