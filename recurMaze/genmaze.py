@@ -14,6 +14,7 @@ class Genmaze:
         self.visited  = self.grid_matrix()  
         self.base_grid = self.grid_matrix()
         self.stored_movements = []
+        self.exit_position = None 
 
     def pprint_matrix(self, matrix):  
         '''Prints the maze matrix in a prettier format''' 
@@ -145,8 +146,12 @@ class Genmaze:
             rand_col = random.randrange(0, len(matrix[rand_row]) - 1) 
             if matrix[rand_row][rand_col] == 1: 
                 found = True 
+                
+        if rand_row and rand_col: 
+            self.exit_position = (rand_row, rand_col)
 
         matrix[rand_row][rand_col] = "E" 
+
 
         
 
